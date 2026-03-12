@@ -43,25 +43,25 @@ This project replicates core Instagram features such as authentication, image po
 
 Clone the repository:
 
-git clone https://github.com/your-username/instagram-clone.git
-cd instagram-clone
+- git clone https://github.com/your-username/instagram-clone.git
+- cd instagram-clone
 
 ## Backend setup
 
-cd backend
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
+- cd backend
+- python -m venv venv
+- venv\Scripts\activate
+- pip install -r requirements.txt
+- python manage.py migrate
+- python manage.py runserver
 
 Backend runs at: http://127.0.0.1:8000
 
 ## Frontend setup
 
-cd frontend
-npm install
-npm start
+- cd frontend
+- npm install
+- npm start
 
 Frontend runs at: http://localhost:3000
 
