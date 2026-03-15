@@ -50,10 +50,10 @@ Clone the repository:
 
 - cd backend
 - python -m venv venv
-- venv\Scripts\activate
+- venv\Scripts\activate (Macos: source venv/bin/activate)
 - pip install -r requirements.txt
 - python manage.py migrate
-- python manage.py runserver
+- python3 manage.py runserver
 
 Backend runs at: http://127.0.0.1:8000
 
