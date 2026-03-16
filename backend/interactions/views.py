@@ -11,6 +11,8 @@ from posts.models import Post
 from .models import Comment, Like
 from .serializers import CommentSerializer, LikeSerializer
 
+from notifications.models import Notification
+
 
 class CommentPagination(PageNumberPagination):
     page_size = 20
@@ -45,6 +47,17 @@ class LikeAPIView(APIView):
 
         # Nếu chưa like → tạo like
         like = Like.objects.create(user=request.user, post=post)
+
+        # Tạo notification nếu người like không phải chủ bài viết
+        if post.user != request.user:
+            Notification.objects.create(
+                user=post.user,
+                sender=request.user,
+                post=post,
+                type=Notification.NotificationType.LIKE,
+            )
+
+
         serializer = LikeSerializer(like)
 
         return api_success(
