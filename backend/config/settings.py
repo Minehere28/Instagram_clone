@@ -42,6 +42,8 @@ INSTALLED_APPS = [
 
     'users',
     'posts',
+    'interactions',
+    'notifications',
 ]
 
 MIDDLEWARE = [
