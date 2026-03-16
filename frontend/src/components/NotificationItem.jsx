@@ -1,9 +1,23 @@
 function NotificationItem({ notification }) {
+  const sender = notification.sender?.username || "Someone";
+  const typeTextMap = {
+    like: "liked your post",
+    comment: "commented on your post",
+    follow: "started following you",
+  };
+
+  const actionText = typeTextMap[notification.type] || notification.type;
+  const createdAt = notification.created_at
+    ? new Date(notification.created_at).toLocaleString()
+    : "";
+
   return (
     <li className="notification-item">
-      <strong>{notification.sender?.username}</strong> {notification.type}
-      {notification.post ? ` on post #${notification.post}` : ""}
-      <span className="notification-date">{new Date(notification.created_at).toLocaleString()}</span>
+      <p>
+        <strong>{sender}</strong> {actionText}
+        {notification.post ? ` (post #${notification.post})` : ""}
+      </p>
+      {createdAt ? <span className="notification-date">{createdAt}</span> : null}
     </li>
   );
 }

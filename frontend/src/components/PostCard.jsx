@@ -1,36 +1,21 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 
-import { createComment, getComments } from "../services/interactionService";
+import { createComment } from "../services/interactionService";
 import CommentList from "./CommentList";
 import LikeButton from "./LikeButton";
 
 function PostCard({ post }) {
-  const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [reloadCommentsKey, setReloadCommentsKey] = useState(0);
+  const commentInputRef = useRef(null);
 
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadComments() {
-      try {
-        const data = await getComments(post.id);
-        if (mounted) {
-          setComments(data);
-        }
-      } catch (_error) {
-        if (mounted) {
-          setComments([]);
-        }
-      }
-    }
-
-    loadComments();
-
-    return () => {
-      mounted = false;
-    };
-  }, [post.id]);
+  const postImage = post.images?.[0]?.image?.url || post.images?.[0]?.image_url;
+  const username = post.user?.username || "unknown";
+  const createdTime = post.created_at
+    ? new Date(post.created_at).toLocaleString()
+    : "just now";
+  const avatarFallback = username.charAt(0).toUpperCase() || "U";
 
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
@@ -38,9 +23,9 @@ function PostCard({ post }) {
 
     setSubmitting(true);
     try {
-      const created = await createComment(post.id, commentText.trim());
-      setComments((prev) => [...prev, created]);
+      await createComment(post.id, commentText.trim());
       setCommentText("");
+      setReloadCommentsKey((prev) => prev + 1);
     } catch (_error) {
       // Keep UI simple for now.
     } finally {
@@ -51,19 +36,37 @@ function PostCard({ post }) {
   return (
     <article className="post-card">
       <header className="post-header">
-        <strong>{post.user?.username || "unknown"}</strong>
+        <div className="post-user-meta">
+          {post.user?.avatar_url ? (
+            <img src={post.user.avatar_url} alt={username} className="post-avatar" />
+          ) : (
+            <div className="post-avatar post-avatar-fallback">{avatarFallback}</div>
+          )}
+          <div>
+            <strong className="post-username">{username}</strong>
+            <p className="post-time">{createdTime}</p>
+          </div>
+        </div>
       </header>
 
-      {post.images?.length ? (
-        <img
-          src={post.images[0]?.image?.url || post.images[0]?.image_url}
-          alt="post"
-          className="post-image"
-        />
-      ) : null}
+      {postImage ? <img src={postImage} alt="post" className="post-image" /> : null}
 
       <div className="post-body">
-        <p className="post-caption">{post.caption}</p>
+        <div className="post-actions">
+          <LikeButton postId={post.id} />
+          <button
+            type="button"
+            className="comment-button"
+            onClick={() => commentInputRef.current?.focus()}
+          >
+            Comment
+          </button>
+        </div>
+
+        <p className="post-caption">
+          <strong>{username}</strong> {post.caption}
+        </p>
+
         {post.hashtags?.length ? (
           <p className="post-hashtags">
             {post.hashtags.map((tag) => (
@@ -72,12 +75,11 @@ function PostCard({ post }) {
           </p>
         ) : null}
 
-        <LikeButton postId={post.id} />
-
         <section className="post-comments">
-          <CommentList comments={comments} />
+          <CommentList postId={post.id} reloadKey={reloadCommentsKey} />
           <form onSubmit={handleCommentSubmit} className="comment-form">
             <input
+              ref={commentInputRef}
               type="text"
               value={commentText}
               onChange={(event) => setCommentText(event.target.value)}

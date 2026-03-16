@@ -1,6 +1,8 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import "./styles/feed.css";
+import "./styles/navbar.css";
+import "./styles/post.css";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import NotificationsPage from "./pages/NotificationsPage";

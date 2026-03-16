@@ -25,8 +25,14 @@ function LikeButton({ postId, initialLiked = false, onLikeChange }) {
   };
 
   return (
-    <button type="button" className="like-button" onClick={handleLike} disabled={loading || liked}>
-      {liked ? "Liked" : "Like"}
+    <button
+      type="button"
+      className={`like-button ${liked ? "is-liked" : ""}`}
+      onClick={handleLike}
+      disabled={loading}
+      aria-label={liked ? "Liked" : "Like"}
+    >
+      {liked ? "❤️" : "🤍"}
     </button>
   );
 }
