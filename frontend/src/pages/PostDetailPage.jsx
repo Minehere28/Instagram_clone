@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import CommentList from "../components/CommentList";
+import ImageCarousel from "../components/ImageCarousel";
 import LikeButton from "../components/LikeButton";
 import Navbar from "../components/Navbar";
 import { createComment } from "../services/interactionService";
@@ -62,8 +63,6 @@ function PostDetailPage() {
     }
   };
 
-  const postImage = post?.images?.[0]?.image?.url || post?.images?.[0]?.image_url;
-
   return (
     <div className="feed-page">
       <Navbar />
@@ -79,7 +78,7 @@ function PostDetailPage() {
 
         {!loading && !error && post ? (
           <article className="post-detail-card">
-            {postImage ? <img src={postImage} alt="post detail" className="post-detail-image" /> : null}
+            <ImageCarousel images={post.images || []} altPrefix="Post detail" />
 
             <div className="post-detail-body">
               <p className="post-caption">

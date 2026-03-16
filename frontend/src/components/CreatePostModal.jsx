@@ -3,27 +3,24 @@ import { useEffect, useMemo, useState } from "react";
 import { createPost } from "../services/postService";
 
 function CreatePostModal({ isOpen, onClose, onPostCreated }) {
-  const [imageFile, setImageFile] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
   const [caption, setCaption] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const previewUrl = useMemo(() => {
-    if (!imageFile) return "";
-    return URL.createObjectURL(imageFile);
-  }, [imageFile]);
+  const previewUrls = useMemo(() => {
+    return imageFiles.map((file) => URL.createObjectURL(file));
+  }, [imageFiles]);
 
   useEffect(() => {
     return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [previewUrl]);
+  }, [previewUrls]);
 
   useEffect(() => {
     if (!isOpen) {
-      setImageFile(null);
+      setImageFiles([]);
       setCaption("");
       setError("");
       setLoading(false);
@@ -35,8 +32,8 @@ function CreatePostModal({ isOpen, onClose, onPostCreated }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!imageFile) {
-      setError("Please select an image.");
+    if (!imageFiles.length) {
+      setError("Please select at least one image.");
       return;
     }
 
@@ -45,8 +42,10 @@ function CreatePostModal({ isOpen, onClose, onPostCreated }) {
 
     try {
       const formData = new FormData();
-      formData.append("image", imageFile);
       formData.append("caption", caption);
+      imageFiles.forEach((file) => {
+        formData.append("uploaded_images", file);
+      });
 
       const newPost = await createPost(formData);
       onPostCreated?.(newPost);
@@ -72,13 +71,18 @@ function CreatePostModal({ isOpen, onClose, onPostCreated }) {
           <input
             type="file"
             accept="image/png,image/jpeg,image/jpg,image/webp"
-            onChange={(event) => setImageFile(event.target.files?.[0] || null)}
+            multiple
+            onChange={(event) => setImageFiles(Array.from(event.target.files || []))}
             disabled={loading}
           />
 
-          {previewUrl ? (
-            <div className="preview-wrap">
-              <img src={previewUrl} alt="Selected preview" className="preview-image" />
+          {previewUrls.length ? (
+            <div className="preview-grid">
+              {previewUrls.map((url, idx) => (
+                <div className="preview-wrap" key={`${url}-${idx}`}>
+                  <img src={url} alt={`Selected preview ${idx + 1}`} className="preview-image" />
+                </div>
+              ))}
             </div>
           ) : null}
 

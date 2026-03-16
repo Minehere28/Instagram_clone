@@ -16,9 +16,10 @@ export async function getPosts(params = {}) {
 }
 
 export async function createPost(formData) {
-  const image = formData.get("image");
-  if (image) {
-    formData.append("uploaded_images", image);
+  const hasUploadedImages = formData.getAll("uploaded_images").length > 0;
+  const singleImage = formData.get("image");
+  if (!hasUploadedImages && singleImage) {
+    formData.append("uploaded_images", singleImage);
   }
 
   const response = await api.post("posts/", formData, {

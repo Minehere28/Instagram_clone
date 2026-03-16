@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 
 import { createComment } from "../services/interactionService";
 import CommentList from "./CommentList";
+import ImageCarousel from "./ImageCarousel";
 import LikeButton from "./LikeButton";
 
 function PostCard({ post }) {
@@ -10,7 +11,6 @@ function PostCard({ post }) {
   const [reloadCommentsKey, setReloadCommentsKey] = useState(0);
   const commentInputRef = useRef(null);
 
-  const postImage = post.images?.[0]?.image?.url || post.images?.[0]?.image_url;
   const username = post.user?.username || "unknown";
   const createdTime = post.created_at
     ? new Date(post.created_at).toLocaleString()
@@ -49,7 +49,7 @@ function PostCard({ post }) {
         </div>
       </header>
 
-      {postImage ? <img src={postImage} alt="post" className="post-image" /> : null}
+      <ImageCarousel images={post.images || []} altPrefix={`Post by ${username}`} />
 
       <div className="post-body">
         <div className="post-actions">

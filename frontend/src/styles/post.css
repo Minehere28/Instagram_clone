@@ -51,6 +51,44 @@
   max-height: 560px;
 }
 
+.image-carousel {
+  position: relative;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: rgba(17, 17, 17, 0.55);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.carousel-btn-left {
+  left: 8px;
+}
+
+.carousel-btn-right {
+  right: 8px;
+}
+
+.carousel-indicator {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 12px;
+}
+
 .post-body {
   padding: 12px;
 }

@@ -50,6 +50,12 @@
   padding: 10px;
 }
 
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .preview-wrap {
   border: 1px solid #ececec;
   border-radius: 10px;
@@ -59,7 +65,7 @@
 .preview-image {
   width: 100%;
   display: block;
-  max-height: 360px;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
 }
 
