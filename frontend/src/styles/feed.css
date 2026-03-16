@@ -72,6 +72,10 @@
   color: #8e8e8e;
 }
 
+.infinite-loader-sentinel {
+  height: 8px;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);

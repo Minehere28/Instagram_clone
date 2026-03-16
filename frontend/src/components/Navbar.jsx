@@ -5,6 +5,7 @@ import { getCurrentUser, logout } from "../services/authService";
 import { getUnreadNotificationsCount } from "../services/notificationService";
 
 import CreatePostModal from "./CreatePostModal";
+import SearchBar from "./SearchBar";
 
 function Navbar({ onPostCreated }) {
   const navigate = useNavigate();
@@ -48,6 +49,9 @@ function Navbar({ onPostCreated }) {
       <Link to="/" className="navbar-logo-wrap" aria-label="Instagram Home">
         <img src="/logo_ins.png" alt="Instagram" className="navbar-logo" />
       </Link>
+
+      <SearchBar />
+
       <div className="navbar-actions">
         <button type="button" className="nav-btn" onClick={() => navigate("/")}>
           Home
