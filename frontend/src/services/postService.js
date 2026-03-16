@@ -16,8 +16,18 @@ export async function getPosts(params = {}) {
 }
 
 export async function createPost(formData) {
+  const image = formData.get("image");
+  if (image) {
+    formData.append("uploaded_images", image);
+  }
+
   const response = await api.post("posts/", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
+  return response.data?.data || response.data;
+}
+
+export async function getPostById(id) {
+  const response = await api.get(`posts/${id}`);
   return response.data?.data || response.data;
 }

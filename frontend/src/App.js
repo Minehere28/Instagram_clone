@@ -1,11 +1,15 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import "./styles/feed.css";
+import "./styles/grid.css";
+import "./styles/modal.css";
 import "./styles/navbar.css";
+import "./styles/profile.css";
 import "./styles/post.css";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import NotificationsPage from "./pages/NotificationsPage";
+import PostDetailPage from "./pages/PostDetailPage";
 import ProfilePage from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
 
@@ -44,6 +48,14 @@ function App() {
 					element={
 						<ProtectedRoute>
 							<NotificationsPage />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/post/:id"
+					element={
+						<ProtectedRoute>
+							<PostDetailPage />
 						</ProtectedRoute>
 					}
 				/>

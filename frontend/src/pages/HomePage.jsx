@@ -40,7 +40,7 @@ function HomePage() {
 
   return (
     <div className="feed-page">
-      <Navbar />
+      <Navbar onPostCreated={(newPost) => setPosts((prev) => [newPost, ...prev])} />
       <main className="feed-container">
         {loading ? (
           <div className="loading-wrap" role="status" aria-live="polite">

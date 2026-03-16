@@ -1,11 +1,42 @@
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { getCurrentUser, logout } from "../services/authService";
+import { getUnreadNotificationsCount } from "../services/notificationService";
 
-function Navbar() {
+import CreatePostModal from "./CreatePostModal";
+
+function Navbar({ onPostCreated }) {
   const navigate = useNavigate();
   const currentUser = getCurrentUser();
   const profileUsername = currentUser?.username || "me";
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadUnreadCount() {
+      try {
+        const count = await getUnreadNotificationsCount();
+        if (mounted) {
+          setUnreadCount(count);
+        }
+      } catch (_error) {
+        if (mounted) {
+          setUnreadCount(0);
+        }
+      }
+    }
+
+    loadUnreadCount();
+    const timer = setInterval(loadUnreadCount, 30000);
+
+    return () => {
+      mounted = false;
+      clearInterval(timer);
+    };
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -21,12 +52,15 @@ function Navbar() {
         <button type="button" className="nav-btn" onClick={() => navigate("/")}>
           Home
         </button>
+        <button type="button" className="nav-btn" onClick={() => setIsModalOpen(true)}>
+          + Create
+        </button>
         <button
           type="button"
           className="nav-btn"
           onClick={() => navigate("/notifications")}
         >
-          Notifications
+          🔔 {unreadCount > 0 ? unreadCount : ""}
         </button>
         <button
           type="button"
@@ -39,6 +73,12 @@ function Navbar() {
           Logout
         </button>
       </div>
+
+      <CreatePostModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onPostCreated={onPostCreated}
+      />
     </nav>
   );
 }
