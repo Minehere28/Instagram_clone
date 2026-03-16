@@ -2,15 +2,23 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework import status
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from notifications.models import Notification
+from common.responses import api_error, api_success
+from common.schema import OpenApiResponse, OpenApiTypes, extend_schema
 
 from .models import Follow, Profile
-from .serializers import LoginSerializer, ProfileSerializer, RegisterSerializer
+from .serializers import (
+	LoginSerializer,
+	LogoutSerializer,
+	ProfileSerializer,
+	RefreshSerializer,
+	RegisterSerializer,
+	UserSerializer,
+)
 
 
 def _get_tokens_for_user(user):
@@ -23,23 +31,45 @@ def _get_tokens_for_user(user):
 
 class RegisterAPIView(APIView):
 	permission_classes = [AllowAny]
+	throttle_classes = [ScopedRateThrottle]
+	throttle_scope = "auth_register"
 
+	@extend_schema(
+		request=RegisterSerializer,
+		responses={
+			201: OpenApiResponse(response=OpenApiTypes.OBJECT, description="User registered"),
+		},
+		tags=["Auth"],
+	)
 	def post(self, request):
 		serializer = RegisterSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		user = serializer.save()
-		return Response(
+		tokens = _get_tokens_for_user(user)
+		return api_success(
 			{
-				"user": serializer.data,
-				"tokens": _get_tokens_for_user(user),
+				"access": tokens["access"],
+				"refresh": tokens["refresh"],
+				"user": UserSerializer(user).data,
 			},
-			status=status.HTTP_201_CREATED,
+			message="Registration successful",
+			status_code=status.HTTP_201_CREATED,
 		)
 
 
 class LoginAPIView(APIView):
 	permission_classes = [AllowAny]
+	throttle_classes = [ScopedRateThrottle]
+	throttle_scope = "auth_login"
 
+	@extend_schema(
+		request=LoginSerializer,
+		responses={
+			200: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Authenticated"),
+			401: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Invalid credentials"),
+		},
+		tags=["Auth"],
+	)
 	def post(self, request):
 		serializer = LoginSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
@@ -49,62 +79,103 @@ class LoginAPIView(APIView):
 			password=serializer.validated_data["password"],
 		)
 		if not user:
-			return Response(
-				{"detail": "Invalid credentials."},
-				status=status.HTTP_401_UNAUTHORIZED,
-			)
+			return api_error("Invalid credentials.", status_code=status.HTTP_401_UNAUTHORIZED)
 
-		return Response(
+		tokens = _get_tokens_for_user(user)
+		return api_success(
 			{
-				"user": {"id": user.id, "username": user.username, "email": user.email},
-				"tokens": _get_tokens_for_user(user),
+				"access": tokens["access"],
+				"refresh": tokens["refresh"],
+				"user": UserSerializer(user).data,
 			},
-			status=status.HTTP_200_OK,
+			message="Login successful",
+			status_code=status.HTTP_200_OK,
 		)
+
+
+class RefreshTokenAPIView(APIView):
+	permission_classes = [AllowAny]
+	throttle_classes = [ScopedRateThrottle]
+	throttle_scope = "auth_login"
+
+	@extend_schema(
+		request=RefreshSerializer,
+		responses={200: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Token refreshed")},
+		tags=["Auth"],
+	)
+	def post(self, request):
+		serializer = RefreshSerializer(data=request.data)
+		serializer.is_valid(raise_exception=True)
+		return api_success(
+			serializer.validated_data,
+			message="Token refreshed",
+			status_code=status.HTTP_200_OK,
+		)
+
+
+class LogoutAPIView(APIView):
+	permission_classes = [IsAuthenticated]
+
+	@extend_schema(
+		request=LogoutSerializer,
+		responses={200: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Logged out")},
+		tags=["Auth"],
+	)
+	def post(self, request):
+		serializer = LogoutSerializer(data=request.data)
+		serializer.is_valid(raise_exception=True)
+		try:
+			token = RefreshToken(serializer.validated_data["refresh"])
+			token.blacklist()
+		except Exception:
+			return api_error("Invalid refresh token.", status_code=status.HTTP_400_BAD_REQUEST)
+
+		return api_success(message="Logout successful", status_code=status.HTTP_200_OK)
 
 
 class UserProfileAPIView(APIView):
 	permission_classes = [IsAuthenticated]
 
+	@extend_schema(
+		responses={200: ProfileSerializer},
+		tags=["Users"],
+	)
 	def get(self, request, id):
 		target_user = get_object_or_404(User, id=id)
 		profile, _ = Profile.objects.get_or_create(user=target_user)
-		serializer = ProfileSerializer(profile)
-		return Response(serializer.data)
+		serializer = ProfileSerializer(profile, context={"request": request})
+		return api_success(serializer.data)
 
 
 class FollowUserAPIView(APIView):
-	permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
-	def post(self, request, id):
-		target_user = get_object_or_404(User, id=id)
-		if target_user == request.user:
-			return Response(
-				{"detail": "You cannot follow yourself."},
-				status=status.HTTP_400_BAD_REQUEST,
-			)
+    @extend_schema(
+        responses={201: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Followed")},
+        tags=["Users"],
+    )
+    def post(self, request, id):
+        target_user = get_object_or_404(User, id=id)
+        if target_user == request.user:
+            return api_error("You cannot follow yourself.", status_code=status.HTTP_400_BAD_REQUEST)
 
-		_, created = Follow.objects.get_or_create(
-			follower=request.user,
-			following=target_user,
-		)
-		if not created:
-			return Response(
-				{"detail": "Already following this user."},
-				status=status.HTTP_200_OK,
-			)
+        _, created = Follow.objects.get_or_create(
+            follower=request.user,
+            following=target_user,
+        )
+        if not created:
+            return api_success(message="Already following this user.", status_code=status.HTTP_200_OK)
 
-		Notification.objects.create(
-			user=target_user,
-			sender=request.user,
-			type=Notification.NotificationType.FOLLOW,
-		)
-		return Response({"detail": "Followed successfully."}, status=status.HTTP_201_CREATED)
+        return api_success(message="Followed successfully.", status_code=status.HTTP_201_CREATED)
 
 
 class UnfollowUserAPIView(APIView):
 	permission_classes = [IsAuthenticated]
 
+	@extend_schema(
+		responses={200: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Unfollowed")},
+		tags=["Users"],
+	)
 	def post(self, request, id):
 		target_user = get_object_or_404(User, id=id)
 		deleted_count, _ = Follow.objects.filter(
@@ -113,9 +184,6 @@ class UnfollowUserAPIView(APIView):
 		).delete()
 
 		if deleted_count == 0:
-			return Response(
-				{"detail": "You are not following this user."},
-				status=status.HTTP_404_NOT_FOUND,
-			)
+			return api_error("You are not following this user.", status_code=status.HTTP_404_NOT_FOUND)
 
-		return Response({"detail": "Unfollowed successfully."}, status=status.HTTP_200_OK)
+		return api_success(message="Unfollowed successfully.", status_code=status.HTTP_200_OK)

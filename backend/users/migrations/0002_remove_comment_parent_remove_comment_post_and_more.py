@@ -25,6 +25,10 @@ class Migration(migrations.Migration):
             model_name='comment',
             name='user',
         ),
+        migrations.AlterUniqueTogether(
+            name='posthashtag',
+            unique_together=None,
+        ),
         migrations.RemoveField(
             model_name='posthashtag',
             name='hashtag',
@@ -64,10 +68,6 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name='postimage',
             name='post',
-        ),
-        migrations.AlterUniqueTogether(
-            name='posthashtag',
-            unique_together=None,
         ),
         migrations.AlterUniqueTogether(
             name='follow',

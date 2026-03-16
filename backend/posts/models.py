@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from common.validators import validate_image_file
+
 
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
@@ -14,7 +16,7 @@ class Post(models.Model):
 
 class PostImage(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="images")
-    image_url = models.ImageField(upload_to="posts/")
+    image_url = models.ImageField(upload_to="posts/", validators=[validate_image_file])
     display_order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 

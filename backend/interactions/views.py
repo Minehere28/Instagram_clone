@@ -2,10 +2,10 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from notifications.models import Notification
+from common.responses import api_error, api_success
+from common.schema import OpenApiResponse, OpenApiTypes, extend_schema
 from posts.models import Post
 
 from .models import Comment, Like
@@ -21,59 +21,54 @@ class CommentPagination(PageNumberPagination):
 class LikeAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=LikeSerializer,
+        responses={201: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Liked")},
+        tags=["Interactions"],
+    )
     def post(self, request):
         post_id = request.data.get("post_id")
         if not post_id:
-            return Response(
-                {"detail": "post_id is required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return api_error("post_id is required.", status_code=status.HTTP_400_BAD_REQUEST)
 
         post = get_object_or_404(Post, id=post_id)
         like, created = Like.objects.get_or_create(user=request.user, post=post)
-        if created and post.user_id != request.user.id:
-            Notification.objects.create(
-                user=post.user,
-                sender=request.user,
-                post=post,
-                type=Notification.NotificationType.LIKE,
-            )
-
         serializer = LikeSerializer(like)
-        return Response(
+        return api_success(
             serializer.data,
-            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+            message="Post liked" if created else "Already liked",
+            status_code=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
         )
 
+    @extend_schema(
+        request=LikeSerializer,
+        responses={200: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Unliked")},
+        tags=["Interactions"],
+    )
     def delete(self, request):
         post_id = request.data.get("post_id")
         if not post_id:
-            return Response(
-                {"detail": "post_id is required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return api_error("post_id is required.", status_code=status.HTTP_400_BAD_REQUEST)
 
         post = get_object_or_404(Post, id=post_id)
         deleted_count, _ = Like.objects.filter(user=request.user, post=post).delete()
         if deleted_count == 0:
-            return Response(
-                {"detail": "Like not found."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            return api_error("Like not found.", status_code=status.HTTP_404_NOT_FOUND)
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return api_success(message="Like removed", status_code=status.HTTP_200_OK)
 
 
 class CommentAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        responses={200: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Comments list")},
+        tags=["Interactions"],
+    )
     def get(self, request):
         post_id = request.query_params.get("post")
         if not post_id:
-            return Response(
-                {"detail": "post query parameter is required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return api_error("post query parameter is required.", status_code=status.HTTP_400_BAD_REQUEST)
 
         post = get_object_or_404(Post, id=post_id)
         queryset = (
@@ -86,28 +81,38 @@ class CommentAPIView(APIView):
         paginator = CommentPagination()
         page = paginator.paginate_queryset(queryset, request, view=self)
         serializer = CommentSerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        paginated = paginator.get_paginated_response(serializer.data)
+        return api_success(paginated.data)
 
+    @extend_schema(
+        request=CommentSerializer,
+        responses={201: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Comment created")},
+        tags=["Interactions"],
+    )
     def post(self, request):
         serializer = CommentSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         comment = serializer.save()
 
-        if comment.post.user_id != request.user.id:
-            Notification.objects.create(
-                user=comment.post.user,
-                sender=request.user,
-                post=comment.post,
-                type=Notification.NotificationType.COMMENT,
-            )
-
-        return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
+        return api_success(
+            CommentSerializer(comment).data,
+            message="Comment created",
+            status_code=status.HTTP_201_CREATED,
+        )
 
 
 class CommentListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CommentSerializer
     pagination_class = CommentPagination
+
+    @extend_schema(
+        responses={200: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Comments list")},
+        tags=["Interactions"],
+    )
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return api_success(response.data)
 
     def get_queryset(self):
         post_id = self.kwargs.get("post_id") or self.request.query_params.get("post")

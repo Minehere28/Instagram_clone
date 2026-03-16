@@ -7,9 +7,26 @@ from .models import Hashtag, Post, PostHashtag, PostImage
 
 
 class PostImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = PostImage
-        fields = ["id", "image_url", "display_order", "created_at"]
+        fields = ["id", "image_url", "image", "display_order", "created_at"]
+
+    def get_image(self, obj):
+        request = self.context.get("request")
+        url = None
+        if obj.image_url:
+            url = (
+                request.build_absolute_uri(obj.image_url.url)
+                if request
+                else obj.image_url.url
+            )
+        return {
+            "url": url,
+            "name": obj.image_url.name.split("/")[-1] if obj.image_url else None,
+            "size": obj.image_url.size if obj.image_url else None,
+        }
 
 
 class HashtagSerializer(serializers.ModelSerializer):
