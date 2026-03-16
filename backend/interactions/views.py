@@ -23,7 +23,7 @@ class LikeAPIView(APIView):
 
     @extend_schema(
         request=LikeSerializer,
-        responses={201: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Liked")},
+        responses={201: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Like toggled")},
         tags=["Interactions"],
     )
     def post(self, request):
@@ -32,30 +32,26 @@ class LikeAPIView(APIView):
             return api_error("post_id is required.", status_code=status.HTTP_400_BAD_REQUEST)
 
         post = get_object_or_404(Post, id=post_id)
-        like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+        like = Like.objects.filter(user=request.user, post=post).first()
+
+        # Nếu đã like → unlike
+        if like:
+            like.delete()
+            return api_success(
+                message="Post unliked",
+                status_code=status.HTTP_200_OK
+            )
+
+        # Nếu chưa like → tạo like
+        like = Like.objects.create(user=request.user, post=post)
         serializer = LikeSerializer(like)
+
         return api_success(
             serializer.data,
-            message="Post liked" if created else "Already liked",
-            status_code=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+            message="Post liked",
+            status_code=status.HTTP_201_CREATED,
         )
-
-    @extend_schema(
-        request=LikeSerializer,
-        responses={200: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Unliked")},
-        tags=["Interactions"],
-    )
-    def delete(self, request):
-        post_id = request.data.get("post_id")
-        if not post_id:
-            return api_error("post_id is required.", status_code=status.HTTP_400_BAD_REQUEST)
-
-        post = get_object_or_404(Post, id=post_id)
-        deleted_count, _ = Like.objects.filter(user=request.user, post=post).delete()
-        if deleted_count == 0:
-            return api_error("Like not found.", status_code=status.HTTP_404_NOT_FOUND)
-
-        return api_success(message="Like removed", status_code=status.HTTP_200_OK)
 
 
 class CommentAPIView(APIView):

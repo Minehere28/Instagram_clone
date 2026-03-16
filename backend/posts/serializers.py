@@ -78,10 +78,21 @@ class PostSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         hashtags = validated_data.pop("hashtag_names", [])
         uploaded_images = validated_data.pop("uploaded_images", [])
-        user = self.context["request"].user
 
+        # normalize hashtag input
+        normalized_hashtags = []
+
+        for tag in hashtags:
+            if isinstance(tag, str) and "," in tag:
+                normalized_hashtags.extend(
+                    [t.strip() for t in tag.split(",") if t.strip()]
+                )
+            else:
+                normalized_hashtags.append(tag.strip())
+
+        hashtags = normalized_hashtags
         with transaction.atomic():
-            post = Post.objects.create(user=user, **validated_data)
+            post = Post.objects.create(**validated_data)
 
             for index, image in enumerate(uploaded_images):
                 PostImage.objects.create(
@@ -94,7 +105,12 @@ class PostSerializer(serializers.ModelSerializer):
                 cleaned_name = tag_name.strip().lstrip("#").lower()
                 if not cleaned_name:
                     continue
+
                 hashtag, _ = Hashtag.objects.get_or_create(name=cleaned_name)
-                PostHashtag.objects.get_or_create(post=post, hashtag=hashtag)
+
+                PostHashtag.objects.get_or_create(
+                    post=post,
+                    hashtag=hashtag
+                )
 
         return post
