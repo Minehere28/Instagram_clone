@@ -10,8 +10,10 @@ function LikeButton({ postId, initialLiked = false, onLikeChange }) {
     if (loading) return;
 
     const previous = liked;
-    setLiked(true);
-    onLikeChange?.(true);
+    const nextState = !previous;
+
+    setLiked(nextState);
+    onLikeChange?.(nextState);
     setLoading(true);
 
     try {
