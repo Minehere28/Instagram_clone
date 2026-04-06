@@ -1,45 +1,46 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-class Profile(models.Model):
+from common.validators import validate_image_file
 
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
-    avatar = models.ImageField(upload_to='avatars/')
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    avatar = models.ImageField(
+        upload_to="avatars/",
+        validators=[validate_image_file],
+        blank=True,
+        null=True,
+    )
     bio = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profile of {self.user.username}"
+
 
 class Follow(models.Model):
-
-    follower = models.ForeignKey(User,
-                                 related_name='following',
-                                 on_delete=models.CASCADE)
-
-    following = models.ForeignKey(User,
-                                  related_name='followers',
-                                  on_delete=models.CASCADE)
-
-from django.db import models
-from django.contrib.auth.models import User
-
-class Post(models.Model):
-
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='posts/')
-    caption = models.TextField()
-
+    follower = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="following_relationships",
+    )
+    following = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="follower_relationships",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
-class Like(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["follower", "following"],
+                name="unique_follow_relationship",
+            )
+        ]
 
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
-    post = models.ForeignKey(Post,on_delete=models.CASCADE)
-
-class Comment(models.Model):
-
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
-
-    post = models.ForeignKey(Post,on_delete=models.CASCADE)
-
-    text = models.TextField()
-
-    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.follower.username} follows {self.following.username}"
 

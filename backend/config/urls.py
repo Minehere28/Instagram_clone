@@ -15,12 +15,47 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from rest_framework_simplejwt.views import TokenObtainPairView
+from django.conf import settings
+from django.conf.urls.static import static
+from django.http import JsonResponse
+from django.urls import include, path
+
+try:
+    from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
+    spectacular_urlpatterns = [
+        path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+        path(
+            'api/docs/',
+            SpectacularSwaggerView.as_view(url_name='schema'),
+            name='swagger-ui',
+        ),
+    ]
+except ModuleNotFoundError:
+    def schema_unavailable(_request):
+        return JsonResponse(
+            {
+                'detail': (
+                    'drf-spectacular is not available in this environment. '
+                    'Install it in a supported Python version to enable schema output.'
+                )
+            },
+            status=503,
+        )
+
+    spectacular_urlpatterns = []
+    spectacular_urlpatterns.append(path('api/schema/', schema_unavailable, name='schema'))
+    spectacular_urlpatterns.append(path('api/docs/', schema_unavailable, name='swagger-ui'))
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
-    # API LOGIN
-    path('api/login/', TokenObtainPairView.as_view(), name='login'),
+    path('api/', include('users.urls')),
+    path('api/', include('posts.urls')),
+    path('api/', include('interactions.urls')),
+    path('api/notifications/', include('notifications.urls')),
 ]
+
+urlpatterns += spectacular_urlpatterns
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
