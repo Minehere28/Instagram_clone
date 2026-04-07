@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.throttling import ScopedRateThrottle
@@ -17,6 +18,7 @@ from .serializers import (
 	ProfileSerializer,
 	RefreshSerializer,
 	RegisterSerializer,
+	UserSearchSerializer,
 	UserSerializer,
 )
 
@@ -187,3 +189,24 @@ class UnfollowUserAPIView(APIView):
 			return api_error("You are not following this user.", status_code=status.HTTP_404_NOT_FOUND)
 
 		return api_success(message="Unfollowed successfully.", status_code=status.HTTP_200_OK)
+
+
+class UserSearchAPIView(APIView):
+	permission_classes = [IsAuthenticated]
+
+	@extend_schema(
+		responses={200: OpenApiResponse(response=OpenApiTypes.OBJECT, description="User search results")},
+		tags=["Users"],
+	)
+	def get(self, request):
+		query = request.query_params.get("q", "").strip()
+		if not query:
+			return api_success([])
+
+		users = (
+			User.objects.select_related("profile")
+			.filter(Q(username__icontains=query))
+			.order_by("username")[:10]
+		)
+		serializer = UserSearchSerializer(users, many=True, context={"request": request})
+		return api_success(serializer.data)
