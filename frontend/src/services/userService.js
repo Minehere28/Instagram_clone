@@ -1,5 +1,4 @@
 import api from "./api";
-import { getCurrentUser } from "./authService";
 import { getPosts } from "./postService";
 
 export async function getProfileById(id) {
@@ -7,25 +6,11 @@ export async function getProfileById(id) {
   return response.data?.data || response.data;
 }
 
-export async function findUserByUsername(username) {
-  const current = getCurrentUser();
-  if (current?.username === username) {
-    return current;
-  }
-
-  const posts = await getPosts();
-  const matchedPost = posts.find((post) => post.user?.username === username);
-  return matchedPost?.user || null;
-}
-
 export async function getProfileByUsername(username) {
-  const user = await findUserByUsername(username);
-  if (!user?.id) {
-    throw new Error("User not found in current feed context.");
-  }
-
-  const profile = await getProfileById(user.id);
-  const userPosts = await getPosts({ user: user.id });
+  const response = await api.get(`users/profile/username/${username}`);
+  const profile = response.data?.data || response.data;
+  const user = profile.user;
+  const userPosts = user?.id ? await getPosts({ user: user.id }) : [];
 
   return {
     user,

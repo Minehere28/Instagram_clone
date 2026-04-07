@@ -149,6 +149,20 @@ class UserProfileAPIView(APIView):
 		return api_success(serializer.data)
 
 
+class UserProfileByUsernameAPIView(APIView):
+	permission_classes = [IsAuthenticated]
+
+	@extend_schema(
+		responses={200: ProfileSerializer},
+		tags=["Users"],
+	)
+	def get(self, request, username):
+		target_user = get_object_or_404(User, username=username)
+		profile, _ = Profile.objects.get_or_create(user=target_user)
+		serializer = ProfileSerializer(profile, context={"request": request})
+		return api_success(serializer.data)
+
+
 class FollowUserAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
