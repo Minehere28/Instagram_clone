@@ -51,7 +51,7 @@ Clone the repository:
 - cd backend
 - python -m venv venv
 - venv\Scripts\activate (Macos: source venv/bin/activate)
-- pip install -r requirements.txt
+- pip install -r requirements.txt (hoặc nếu lỗi thì: pip3 install -r requirements.txt)
 - python3 manage.py makemigrations
 - python3 manage.py migrate
 - python3 manage.py runserver
