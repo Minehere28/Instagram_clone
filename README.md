@@ -48,10 +48,11 @@ Clone the repository:
 
 ## Backend setup
 
-- cd backend
-- python -m venv venv
-- venv\Scripts\activate (Macos: source venv/bin/activate)
+
+- python -m backend/venv venv 
+- backend\venv\Scripts\activate (Macos: source backend/venv/bin/activate)
 - pip install -r requirements.txt (hoặc nếu lỗi thì: pip3 install -r requirements.txt)
+- cd backend
 - python3 manage.py makemigrations
 - python3 manage.py migrate
 - python3 manage.py runserver
