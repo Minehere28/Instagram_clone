@@ -10,6 +10,7 @@ from .views import (
     UserSearchAPIView,
     UnfollowUserAPIView,
     UserProfileAPIView,
+    ChangeAvatarAPIView,
 )
 
 urlpatterns = [
@@ -24,6 +25,7 @@ urlpatterns = [
         name="user-profile-by-username",
     ),
     path("users/search/", UserSearchAPIView.as_view(), name="user-search"),
+    path("users/profile/avatar", ChangeAvatarAPIView.as_view(), name="change-avatar"),
     path("users/follow/<int:id>", FollowUserAPIView.as_view(), name="follow-user"),
     path("users/unfollow/<int:id>", UnfollowUserAPIView.as_view(), name="unfollow-user"),
 ]

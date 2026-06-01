@@ -28,3 +28,10 @@ export async function unfollowUser(userId) {
   const response = await api.post(`users/unfollow/${userId}`);
   return response.data?.data || response.data;
 }
+
+export async function uploadAvatar(formData) {
+  const response = await api.post(`users/profile/avatar`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data?.data || response.data;
+}

@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from common.responses import api_error, api_success
@@ -224,3 +225,25 @@ class UserSearchAPIView(APIView):
 		)
 		serializer = UserSearchSerializer(users, many=True, context={"request": request})
 		return api_success(serializer.data)
+
+
+class ChangeAvatarAPIView(APIView):
+	permission_classes = [IsAuthenticated]
+	parser_classes = [MultiPartParser, FormParser]
+
+	@extend_schema(
+		request=OpenApiTypes.OBJECT,
+		responses={200: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Avatar updated")},
+		tags=["Users"],
+	)
+	def post(self, request):
+		profile, _ = Profile.objects.get_or_create(user=request.user)
+		avatar_file = request.FILES.get("avatar")
+		if not avatar_file:
+			return api_error("avatar file is required.", status_code=status.HTTP_400_BAD_REQUEST)
+
+		profile.avatar = avatar_file
+		profile.save()
+
+		serializer = ProfileSerializer(profile, context={"request": request})
+		return api_success(serializer.data, message="Avatar updated", status_code=status.HTTP_200_OK)
