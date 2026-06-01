@@ -35,3 +35,8 @@ export async function uploadAvatar(formData) {
   });
   return response.data?.data || response.data;
 }
+
+export async function updateBio(bio) {
+  const response = await api.patch("users/profile/bio", { bio });
+  return response.data?.data || response.data;
+}

@@ -5,8 +5,7 @@ import FollowButton from "../components/FollowButton";
 import Navbar from "../components/Navbar";
 import PostGrid from "../components/PostGrid";
 import { getCurrentUser } from "../services/authService";
-import { getProfileByUsername } from "../services/userService";
-import { uploadAvatar } from "../services/userService";
+import { getProfileByUsername, updateBio, uploadAvatar } from "../services/userService";
 
 function ProfilePage() {
   const { username } = useParams();
@@ -24,6 +23,10 @@ function ProfilePage() {
   const [imageReady, setImageReady] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [avatarError, setAvatarError] = useState("");
+  const [editingBio, setEditingBio] = useState(false);
+  const [bioDraft, setBioDraft] = useState("");
+  const [bioSaving, setBioSaving] = useState(false);
+  const [bioError, setBioError] = useState("");
   const avatarInputRef = useRef(null);
   const cropperRef = useRef(null);
   const imageRef = useRef(null);
@@ -41,6 +44,7 @@ function ProfilePage() {
           setProfileData(data);
           setFollowerCount(data.profile?.followers_count || 0);
           setInitialFollowing(Boolean(data.profile?.is_following));
+          setBioDraft(data.profile?.bio || "");
         }
       } catch (_error) {
         if (mounted) {
@@ -89,6 +93,23 @@ function ProfilePage() {
     setProfileData(data);
     setFollowerCount(data.profile?.followers_count || 0);
     setInitialFollowing(Boolean(data.profile?.is_following));
+    setBioDraft(data.profile?.bio || "");
+  };
+
+  const handleSaveBio = async () => {
+    if (bioSaving) return;
+
+    setBioSaving(true);
+    setBioError("");
+    try {
+      await updateBio(bioDraft);
+      await refreshProfile();
+      setEditingBio(false);
+    } catch (_error) {
+      setBioError("Unable to update bio.");
+    } finally {
+      setBioSaving(false);
+    }
   };
 
   const buildCroppedAvatarFile = async () => {
@@ -379,7 +400,58 @@ function ProfilePage() {
                   </p>
                 </div>
 
-                <p className="profile-bio">{profileData.profile?.bio || "No bio yet."}</p>
+                <div className="profile-bio-wrap">
+                  {!isOwnProfile ? (
+                    <p className="profile-bio">{profileData.profile?.bio || "No bio yet."}</p>
+                  ) : editingBio ? (
+                    <div className="profile-bio-editor">
+                      <textarea
+                        value={bioDraft}
+                        onChange={(event) => setBioDraft(event.target.value)}
+                        className="profile-bio-input"
+                        rows={3}
+                        maxLength={150}
+                        placeholder="Write something about yourself..."
+                      />
+                      <div className="profile-bio-actions">
+                        <button
+                          type="button"
+                          className="confirm-bio-btn"
+                          onClick={handleSaveBio}
+                          disabled={bioSaving}
+                        >
+                          {bioSaving ? "Saving..." : "Save"}
+                        </button>
+                        <button
+                          type="button"
+                          className="cancel-bio-btn"
+                          onClick={() => {
+                            setBioDraft(profileData.profile?.bio || "");
+                            setEditingBio(false);
+                            setBioError("");
+                          }}
+                          disabled={bioSaving}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                      {bioError ? <p className="profile-bio-error">{bioError}</p> : null}
+                    </div>
+                  ) : (
+                    <div className="profile-bio-row">
+                      <p className="profile-bio">{profileData.profile?.bio || "No bio yet."}</p>
+                      <button
+                        type="button"
+                        className="edit-bio-btn"
+                        onClick={() => setEditingBio(true)}
+                        aria-label="Edit bio"
+                        title="Edit bio"
+                      >
+                        ✎
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </section>
 

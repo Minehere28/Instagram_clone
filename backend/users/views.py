@@ -247,3 +247,21 @@ class ChangeAvatarAPIView(APIView):
 
 		serializer = ProfileSerializer(profile, context={"request": request})
 		return api_success(serializer.data, message="Avatar updated", status_code=status.HTTP_200_OK)
+
+
+class UpdateBioAPIView(APIView):
+	permission_classes = [IsAuthenticated]
+
+	@extend_schema(
+		request=OpenApiTypes.OBJECT,
+		responses={200: OpenApiResponse(response=OpenApiTypes.OBJECT, description="Bio updated")},
+		tags=["Users"],
+	)
+	def patch(self, request):
+		profile, _ = Profile.objects.get_or_create(user=request.user)
+		bio = request.data.get("bio", "")
+		profile.bio = bio.strip()
+		profile.save(update_fields=["bio", "updated_at"])
+
+		serializer = ProfileSerializer(profile, context={"request": request})
+		return api_success(serializer.data, message="Bio updated", status_code=status.HTTP_200_OK)

@@ -1,16 +1,17 @@
 from django.urls import path
 
 from .views import (
+    ChangeAvatarAPIView,
     FollowUserAPIView,
     LoginAPIView,
     LogoutAPIView,
     RefreshTokenAPIView,
     RegisterAPIView,
+    UpdateBioAPIView,
     UserProfileByUsernameAPIView,
     UserSearchAPIView,
     UnfollowUserAPIView,
     UserProfileAPIView,
-    ChangeAvatarAPIView,
 )
 
 urlpatterns = [
@@ -26,6 +27,7 @@ urlpatterns = [
     ),
     path("users/search/", UserSearchAPIView.as_view(), name="user-search"),
     path("users/profile/avatar", ChangeAvatarAPIView.as_view(), name="change-avatar"),
+    path("users/profile/bio", UpdateBioAPIView.as_view(), name="update-bio"),
     path("users/follow/<int:id>", FollowUserAPIView.as_view(), name="follow-user"),
     path("users/unfollow/<int:id>", UnfollowUserAPIView.as_view(), name="unfollow-user"),
 ]
