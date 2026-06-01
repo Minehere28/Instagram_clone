@@ -29,6 +29,8 @@ function PostDetailPage() {
         const data = await getPostById(id);
         if (mounted) {
           setPost(data);
+          setLikesCount(data.likes_count || 0);
+          setCommentsCount(data.comments_count || 0);
         }
       } catch (_error) {
         if (mounted) {
@@ -48,17 +50,24 @@ function PostDetailPage() {
     };
   }, [id]);
 
+  const [likesCount, setLikesCount] = useState(0);
+  const [commentsCount, setCommentsCount] = useState(0);
+
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
     if (!commentText.trim() || submitting || !post?.id) return;
 
     setSubmitting(true);
+    const previous = commentsCount;
+    // optimistic update
+    setCommentsCount((c) => c + 1);
     try {
       await createComment(post.id, commentText.trim());
       setCommentText("");
       setReloadCommentsKey((prev) => prev + 1);
     } catch (_error) {
-      // Keep simple for now.
+      // rollback on failure
+      setCommentsCount(previous);
     } finally {
       setSubmitting(false);
     }
@@ -94,8 +103,12 @@ function PostDetailPage() {
 
               <div className="post-actions">
                 <div className="action-with-count">
-                  <LikeButton postId={post.id} initialLiked={Boolean(post.is_liked)} />
-                  <span className="action-count">{post.likes_count || 0}</span>
+                  <LikeButton
+                    postId={post.id}
+                    initialLiked={Boolean(post.is_liked)}
+                    onLikeChange={(next) => setLikesCount((prev) => prev + (next ? 1 : -1))}
+                  />
+                  <span className="action-count">{likesCount}</span>
                 </div>
                 <div className="action-with-count">
                   <button
@@ -105,7 +118,7 @@ function PostDetailPage() {
                   >
                     Comment
                   </button>
-                  <span className="action-count">{post.comments_count || 0}</span>
+                  <span className="action-count">{commentsCount}</span>
                 </div>
               </div>
 

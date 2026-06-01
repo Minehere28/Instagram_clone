@@ -11,6 +11,8 @@ function PostCard({ post }) {
   const [submitting, setSubmitting] = useState(false);
   const [reloadCommentsKey, setReloadCommentsKey] = useState(0);
   const commentInputRef = useRef(null);
+  const [likesCount, setLikesCount] = useState(post.likes_count || 0);
+  const [commentsCount, setCommentsCount] = useState(post.comments_count || 0);
 
   const username = post.user?.username || "unknown";
   const createdTime = post.created_at
@@ -23,12 +25,16 @@ function PostCard({ post }) {
     if (!commentText.trim() || submitting) return;
 
     setSubmitting(true);
+    const previous = commentsCount;
+    // optimistic increment
+    setCommentsCount((c) => c + 1);
     try {
       await createComment(post.id, commentText.trim());
       setCommentText("");
       setReloadCommentsKey((prev) => prev + 1);
     } catch (_error) {
-      // Keep UI simple for now.
+      // rollback
+      setCommentsCount(previous);
     } finally {
       setSubmitting(false);
     }
@@ -57,8 +63,12 @@ function PostCard({ post }) {
       <div className="post-body">
         <div className="post-actions">
           <div className="action-with-count">
-            <LikeButton postId={post.id} initialLiked={Boolean(post.is_liked)} />
-            <span className="action-count">{post.likes_count || 0}</span>
+            <LikeButton
+              postId={post.id}
+              initialLiked={Boolean(post.is_liked)}
+              onLikeChange={(next) => setLikesCount((prev) => prev + (next ? 1 : -1))}
+            />
+            <span className="action-count">{likesCount}</span>
           </div>
           <div className="action-with-count">
             <button
@@ -68,7 +78,7 @@ function PostCard({ post }) {
             >
               Comment
             </button>
-            <span className="action-count">{post.comments_count || 0}</span>
+            <span className="action-count">{commentsCount}</span>
           </div>
         </div>
 
