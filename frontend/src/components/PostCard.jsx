@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { createComment } from "../services/interactionService";
 import CommentList from "./CommentList";
@@ -43,7 +44,9 @@ function PostCard({ post }) {
             <div className="post-avatar post-avatar-fallback">{avatarFallback}</div>
           )}
           <div>
-            <strong className="post-username">{username}</strong>
+            <Link to={`/profile/${username}`} className="post-username post-username-link">
+              <strong>{username}</strong>
+            </Link>
             <p className="post-time">{createdTime}</p>
           </div>
         </div>
@@ -64,7 +67,10 @@ function PostCard({ post }) {
         </div>
 
         <p className="post-caption">
-          <strong>{username}</strong> {post.caption}
+          <Link to={`/profile/${username}`} className="post-caption-username">
+            <strong>{username}</strong>
+          </Link>{" "}
+          {post.caption}
         </p>
 
         {post.hashtags?.length ? (

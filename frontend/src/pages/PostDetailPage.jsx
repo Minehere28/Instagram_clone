@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import CommentList from "../components/CommentList";
 import ImageCarousel from "../components/ImageCarousel";
@@ -82,7 +83,13 @@ function PostDetailPage() {
 
             <div className="post-detail-body">
               <p className="post-caption">
-                <strong>{post.user?.username || "unknown"}</strong> {post.caption}
+                <Link
+                  to={`/profile/${post.user?.username || "unknown"}`}
+                  className="post-caption-username"
+                >
+                  <strong>{post.user?.username || "unknown"}</strong>
+                </Link>{" "}
+                {post.caption}
               </p>
 
               <div className="post-actions">

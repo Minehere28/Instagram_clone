@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function CommentItem({ comment }) {
   const username = comment.user?.username || "user";
   const createdAt = comment.created_at
@@ -7,7 +9,10 @@ function CommentItem({ comment }) {
   return (
     <li className="comment-item">
       <p>
-        <strong>{username}</strong>: {comment.content}
+        <Link to={`/profile/${username}`} className="comment-username-link">
+          <strong>{username}</strong>
+        </Link>{" : "}
+        {comment.content}
       </p>
       {createdAt ? <span className="comment-time">{createdAt}</span> : null}
     </li>
