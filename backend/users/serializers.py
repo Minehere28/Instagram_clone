@@ -6,9 +6,19 @@ from .models import Follow, Profile
 
 
 class UserSerializer(serializers.ModelSerializer):
+    avatar_url = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ["id", "username", "email", "first_name", "last_name"]
+        fields = ["id", "username", "email", "first_name", "last_name", "avatar_url"]
+
+    def get_avatar_url(self, obj):
+        profile = getattr(obj, "profile", None)
+        if not profile or not profile.avatar:
+            return None
+
+        request = self.context.get("request")
+        return request.build_absolute_uri(profile.avatar.url) if request else profile.avatar.url
 
 
 class ProfileSerializer(serializers.ModelSerializer):

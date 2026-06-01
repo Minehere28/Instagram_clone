@@ -52,6 +52,9 @@ function PostDetailPage() {
 
   const [likesCount, setLikesCount] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0);
+  const username = post?.user?.username || "unknown";
+  const avatarFallback = username.charAt(0).toUpperCase() || "U";
+  const createdTime = post?.created_at ? new Date(post.created_at).toLocaleString() : "just now";
 
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
@@ -88,6 +91,22 @@ function PostDetailPage() {
 
         {!loading && !error && post ? (
           <article className="post-detail-card">
+            <header className="post-header">
+              <div className="post-user-meta">
+                {post.user?.avatar_url ? (
+                  <img src={post.user.avatar_url} alt={username} className="post-avatar" />
+                ) : (
+                  <div className="post-avatar post-avatar-fallback">{avatarFallback}</div>
+                )}
+                <div>
+                  <Link to={`/profile/${username}`} className="post-username post-username-link">
+                    <strong>{username}</strong>
+                  </Link>
+                  <p className="post-time">{createdTime}</p>
+                </div>
+              </div>
+            </header>
+
             <ImageCarousel images={post.images || []} altPrefix="Post detail" />
 
             <div className="post-detail-body">

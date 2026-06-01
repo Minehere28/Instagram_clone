@@ -32,16 +32,11 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_replies(self, obj):
         replies = obj.replies.select_related("user").all().order_by("created_at")
+        user_serializer = UserSerializer(context=self.context)
         return [
             {
                 "id": reply.id,
-                "user": {
-                    "id": reply.user.id,
-                    "username": reply.user.username,
-                    "email": reply.user.email,
-                    "first_name": reply.user.first_name,
-                    "last_name": reply.user.last_name,
-                },
+                "user": user_serializer.to_representation(reply.user),
                 "content": reply.content,
                 "created_at": reply.created_at,
                 "updated_at": reply.updated_at,
