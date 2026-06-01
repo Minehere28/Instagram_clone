@@ -89,7 +89,7 @@ class CommentAPIView(APIView):
 
         paginator = CommentPagination()
         page = paginator.paginate_queryset(queryset, request, view=self)
-        serializer = CommentSerializer(page, many=True)
+        serializer = CommentSerializer(page, many=True, context={"request": request})
         paginated = paginator.get_paginated_response(serializer.data)
         return api_success(paginated.data)
 
@@ -104,7 +104,7 @@ class CommentAPIView(APIView):
         comment = serializer.save()
 
         return api_success(
-            CommentSerializer(comment).data,
+            CommentSerializer(comment, context={"request": request}).data,
             message="Comment created",
             status_code=status.HTTP_201_CREATED,
         )
