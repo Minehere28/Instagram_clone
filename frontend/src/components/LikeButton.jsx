@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { likePost } from "../services/interactionService";
 
 function LikeButton({ postId, initialLiked = false, onLikeChange }) {
   const [liked, setLiked] = useState(initialLiked);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLiked(initialLiked);
+  }, [initialLiked]);
 
   const handleLike = async () => {
     if (loading) return;

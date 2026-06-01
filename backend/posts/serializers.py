@@ -1,6 +1,7 @@
 from django.db import transaction
 from rest_framework import serializers
 
+from interactions.models import Like
 from users.serializers import UserSerializer
 
 from .models import Hashtag, Post, PostHashtag, PostImage
@@ -47,6 +48,8 @@ class PostSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     images = PostImageSerializer(many=True, read_only=True)
     hashtags = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
     hashtag_names = serializers.ListField(
         child=serializers.CharField(max_length=100),
         write_only=True,
@@ -66,6 +69,8 @@ class PostSerializer(serializers.ModelSerializer):
             "caption",
             "images",
             "hashtags",
+            "likes_count",
+            "is_liked",
             "hashtag_names",
             "uploaded_images",
             "created_at",
@@ -74,6 +79,16 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_hashtags(self, obj):
         return [item.hashtag.name for item in obj.post_hashtags.select_related("hashtag")]
+
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+
+    def get_is_liked(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return False
+
+        return Like.objects.filter(user=request.user, post=obj).exists()
 
     def create(self, validated_data):
         hashtags = validated_data.pop("hashtag_names", [])

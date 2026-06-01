@@ -86,7 +86,7 @@ function PostDetailPage() {
               </p>
 
               <div className="post-actions">
-                <LikeButton postId={post.id} />
+                <LikeButton postId={post.id} initialLiked={Boolean(post.is_liked)} />
                 <button
                   type="button"
                   className="comment-button"
