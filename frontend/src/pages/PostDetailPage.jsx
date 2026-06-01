@@ -93,14 +93,20 @@ function PostDetailPage() {
               </p>
 
               <div className="post-actions">
-                <LikeButton postId={post.id} initialLiked={Boolean(post.is_liked)} />
-                <button
-                  type="button"
-                  className="comment-button"
-                  onClick={() => commentInputRef.current?.focus()}
-                >
-                  Comment
-                </button>
+                <div className="action-with-count">
+                  <LikeButton postId={post.id} initialLiked={Boolean(post.is_liked)} />
+                  <span className="action-count">{post.likes_count || 0}</span>
+                </div>
+                <div className="action-with-count">
+                  <button
+                    type="button"
+                    className="comment-button"
+                    onClick={() => commentInputRef.current?.focus()}
+                  >
+                    Comment
+                  </button>
+                  <span className="action-count">{post.comments_count || 0}</span>
+                </div>
               </div>
 
               <CommentList postId={post.id} reloadKey={reloadCommentsKey} />

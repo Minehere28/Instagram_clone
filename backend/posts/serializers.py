@@ -49,6 +49,7 @@ class PostSerializer(serializers.ModelSerializer):
     images = PostImageSerializer(many=True, read_only=True)
     hashtags = serializers.SerializerMethodField()
     likes_count = serializers.SerializerMethodField()
+    comments_count = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
     hashtag_names = serializers.ListField(
         child=serializers.CharField(max_length=100),
@@ -70,6 +71,7 @@ class PostSerializer(serializers.ModelSerializer):
             "images",
             "hashtags",
             "likes_count",
+            "comments_count",
             "is_liked",
             "hashtag_names",
             "uploaded_images",
@@ -89,6 +91,10 @@ class PostSerializer(serializers.ModelSerializer):
             return False
 
         return Like.objects.filter(user=request.user, post=obj).exists()
+
+    def get_comments_count(self, obj):
+        # count only top-level comments (exclude replies)
+        return obj.comments.filter(parent__isnull=True).count()
 
     def create(self, validated_data):
         hashtags = validated_data.pop("hashtag_names", [])

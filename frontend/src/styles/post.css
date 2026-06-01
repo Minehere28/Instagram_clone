@@ -12,6 +12,16 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
+.action-with-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-count {
+  color: #444;
+  font-weight: 600;
+}
 .post-user-meta {
   display: flex;
   align-items: center;
