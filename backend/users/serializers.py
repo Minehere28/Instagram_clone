@@ -14,6 +14,10 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     avatar_url = serializers.SerializerMethodField()
+    followers_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
+    posts_count = serializers.SerializerMethodField()
+    is_following = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
@@ -23,6 +27,10 @@ class ProfileSerializer(serializers.ModelSerializer):
             "avatar",
             "avatar_url",
             "bio",
+            "followers_count",
+            "following_count",
+            "posts_count",
+            "is_following",
             "created_at",
             "updated_at",
         ]
@@ -32,6 +40,25 @@ class ProfileSerializer(serializers.ModelSerializer):
             return None
         request = self.context.get("request")
         return request.build_absolute_uri(obj.avatar.url) if request else obj.avatar.url
+
+    def get_followers_count(self, obj):
+        return Follow.objects.filter(following=obj.user).count()
+
+    def get_following_count(self, obj):
+        return Follow.objects.filter(follower=obj.user).count()
+
+    def get_posts_count(self, obj):
+        return obj.user.posts.count()
+
+    def get_is_following(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return False
+
+        if request.user == obj.user:
+            return False
+
+        return Follow.objects.filter(follower=request.user, following=obj.user).exists()
 
 
 class FollowSerializer(serializers.ModelSerializer):

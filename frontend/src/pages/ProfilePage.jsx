@@ -13,6 +13,7 @@ function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [followerCount, setFollowerCount] = useState(0);
+  const [initialFollowing, setInitialFollowing] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -25,6 +26,7 @@ function ProfilePage() {
         if (mounted) {
           setProfileData(data);
           setFollowerCount(data.profile?.followers_count || 0);
+          setInitialFollowing(Boolean(data.profile?.is_following));
         }
       } catch (_error) {
         if (mounted) {
@@ -83,6 +85,7 @@ function ProfilePage() {
                   {!isOwnProfile ? (
                     <FollowButton
                       targetUserId={profileData.user?.id}
+                      initialFollowing={initialFollowing}
                       onFollowChange={(delta) => setFollowerCount((prev) => prev + delta)}
                     />
                   ) : null}
@@ -90,7 +93,7 @@ function ProfilePage() {
 
                 <div className="profile-stats">
                   <p>
-                    <strong>{profileData.posts?.length || 0}</strong> posts
+                    <strong>{profileData.profile?.posts_count || profileData.posts?.length || 0}</strong> posts
                   </p>
                   <p>
                     <strong>{followerCount}</strong> followers
