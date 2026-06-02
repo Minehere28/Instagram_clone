@@ -39,28 +39,41 @@ function NotificationsPage() {
   }, []);
 
   return (
-    <div className="feed-page">
+    <div className="app-shell">
       <Navbar />
-      <div className="simple-page">
-        <h1>Notifications</h1>
+      <div className="page-container">
+        <h1 className="page-title">Notifications</h1>
+
         {loading ? (
-          <div className="loading-wrap">
-            <div className="spinner" />
-            <p>Loading notifications...</p>
+          <div>
+            {[1, 2, 3, 4].map((i) => (
+              <div className="skeleton-notification" key={i}>
+                <div className="skeleton skeleton-notif-icon" />
+                <div className="skeleton-notif-body">
+                  <div className="skeleton skeleton-text" style={{ width: '75%' }} />
+                  <div className="skeleton skeleton-text skeleton-text-sm" style={{ width: '30%' }} />
+                </div>
+              </div>
+            ))}
           </div>
         ) : null}
 
         {!loading && error ? <p className="feed-error">{error}</p> : null}
 
         {!loading && !error && !notifications.length ? (
-          <p className="empty-state-text">No notifications yet.</p>
+          <div className="empty-state">
+            <h3>No notifications yet</h3>
+            <p>When someone interacts with your posts, you'll see it here.</p>
+          </div>
         ) : null}
 
-        <ul className="notification-list">
-          {notifications.map((item) => (
-            <NotificationItem key={item.id} notification={item} />
-          ))}
-        </ul>
+        {!loading && notifications.length ? (
+          <ul className="notification-list">
+            {notifications.map((item) => (
+              <NotificationItem key={item.id} notification={item} />
+            ))}
+          </ul>
+        ) : null}
       </div>
     </div>
   );

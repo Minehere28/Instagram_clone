@@ -19,7 +19,19 @@ export async function login(credentials) {
 
 export async function register(data) {
   const response = await api.post("auth/register", data);
-  return response.data?.data || response.data;
+  const payload = response.data?.data || response.data;
+
+  if (payload?.access) {
+    localStorage.setItem("access_token", payload.access);
+  }
+  if (payload?.refresh) {
+    localStorage.setItem("refresh_token", payload.refresh);
+  }
+  if (payload?.user) {
+    localStorage.setItem("current_user", JSON.stringify(payload.user));
+  }
+
+  return payload;
 }
 
 export async function refreshToken(refresh) {

@@ -64,13 +64,20 @@ function PostDetailPage() {
   };
 
   return (
-    <div className="feed-page">
+    <div className="app-shell">
       <Navbar />
-      <main className="post-detail-page">
+      <main className="detail-container">
         {loading ? (
-          <div className="loading-wrap">
-            <div className="spinner" />
-            <p>Loading post...</p>
+          <div className="skeleton-post-card">
+            <div className="skeleton skeleton-post-image" style={{ height: '400px' }} />
+            <div style={{ padding: '20px' }}>
+              <div className="skeleton skeleton-text" style={{ width: '60%' }} />
+              <div className="skeleton skeleton-text skeleton-text-sm" />
+              <div className="skeleton-post-actions" style={{ marginTop: '16px' }}>
+                <div className="skeleton skeleton-btn" />
+                <div className="skeleton skeleton-btn" />
+              </div>
+            </div>
           </div>
         ) : null}
 
@@ -89,9 +96,10 @@ function PostDetailPage() {
                 <LikeButton postId={post.id} />
                 <button
                   type="button"
-                  className="comment-button"
+                  className="action-btn"
                   onClick={() => commentInputRef.current?.focus()}
                 >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
                   Comment
                 </button>
               </div>

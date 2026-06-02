@@ -67,7 +67,6 @@ function LoginForm() {
 			<p className="forgot">Quên mật khẩu?</p>
 
 			<div className="signup">
-				<br />
 				<p>Chưa có tài khoản?</p>
 				<Link to="/register" className="register-link">
 					Tạo tài khoản mới

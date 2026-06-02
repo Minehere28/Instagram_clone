@@ -105,18 +105,21 @@ function SearchBar() {
 
   return (
     <div className="search-wrap" ref={wrapperRef}>
-      <input
-        type="text"
-        className="search-input"
-        placeholder="Search users"
-        value={query}
-        onChange={(event) => {
-          setQuery(event.target.value);
-          setShowDropdown(true);
-        }}
-        onFocus={() => setShowDropdown(true)}
-        onKeyDown={handleKeyDown}
-      />
+      <div className="search-input-wrapper">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search users..."
+          value={query}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setShowDropdown(true);
+          }}
+          onFocus={() => setShowDropdown(true)}
+          onKeyDown={handleKeyDown}
+        />
+      </div>
 
       <SearchDropdown
         isVisible={showDropdown && (!!query.trim() || loading)}

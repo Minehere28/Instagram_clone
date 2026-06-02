@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import InfiniteLoader from "../components/InfiniteLoader";
-
 import Navbar from "../components/Navbar";
 import PostCard from "../components/PostCard";
 import api from "../services/api";
@@ -62,13 +61,29 @@ function HomePage() {
   }, [error, hasMore, loadPostsPage, loading, page]);
 
   return (
-    <div className="feed-page">
+    <div className="app-shell">
       <Navbar onPostCreated={(newPost) => setPosts((prev) => [newPost, ...prev])} />
       <main className="feed-container">
         {loadingInitial ? (
-          <div className="loading-wrap" role="status" aria-live="polite">
-            <div className="spinner" />
-            <p>Loading feed...</p>
+          <div>
+            {[1, 2, 3].map((i) => (
+              <div className="skeleton-post-card" key={i}>
+                <div className="skeleton-post-header">
+                  <div className="skeleton skeleton-avatar" />
+                  <div style={{ flex: 1 }}>
+                    <div className="skeleton skeleton-text" style={{ width: '40%' }} />
+                    <div className="skeleton skeleton-text skeleton-text-sm" style={{ width: '25%' }} />
+                  </div>
+                </div>
+                <div className="skeleton skeleton-post-image" />
+                <div className="skeleton-post-actions">
+                  <div className="skeleton skeleton-btn" />
+                  <div className="skeleton skeleton-btn" />
+                </div>
+                <div className="skeleton skeleton-text" style={{ width: '70%' }} />
+                <div className="skeleton skeleton-text skeleton-text-sm" />
+              </div>
+            ))}
           </div>
         ) : null}
 
@@ -91,7 +106,6 @@ function HomePage() {
             {loading && hasMore ? (
               <div className="loading-wrap" role="status" aria-live="polite">
                 <div className="spinner" />
-                <p>Loading more posts...</p>
               </div>
             ) : null}
           </>

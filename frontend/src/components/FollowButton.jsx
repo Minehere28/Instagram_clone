@@ -30,8 +30,20 @@ function FollowButton({ targetUserId, initialFollowing = false, onFollowChange }
   };
 
   return (
-    <button type="button" className="follow-btn" onClick={handleClick} disabled={loading}>
-      {following ? "Following" : "Follow"}
+    <button
+      type="button"
+      className={`follow-btn ${following ? "follow-btn--following" : "follow-btn--follow"}`}
+      onClick={handleClick}
+      disabled={loading}
+    >
+      {following ? (
+        <>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Following
+        </>
+      ) : (
+        "Follow"
+      )}
     </button>
   );
 }

@@ -48,13 +48,21 @@ function ProfilePage() {
   const isOwnProfile = currentUser?.username === username;
 
   return (
-    <div className="feed-page">
+    <div className="app-shell">
       <Navbar />
-      <div className="profile-page">
+      <div className="profile-container">
         {loading ? (
-          <div className="loading-wrap">
-            <div className="spinner" />
-            <p>Loading profile...</p>
+          <div className="skeleton-profile-header">
+            <div className="skeleton skeleton-profile-avatar" />
+            <div className="skeleton-profile-info">
+              <div className="skeleton skeleton-text" style={{ width: '50%', height: '24px' }} />
+              <div style={{ display: 'flex', gap: '24px' }}>
+                <div className="skeleton skeleton-text" style={{ width: '60px' }} />
+                <div className="skeleton skeleton-text" style={{ width: '80px' }} />
+                <div className="skeleton skeleton-text" style={{ width: '70px' }} />
+              </div>
+              <div className="skeleton skeleton-text" style={{ width: '80%' }} />
+            </div>
           </div>
         ) : null}
 

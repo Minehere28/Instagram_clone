@@ -39,7 +39,12 @@ function CommentList({ postId, reloadKey = 0 }) {
   }, [postId, reloadKey]);
 
   if (loading) {
-    return <p className="comments-loading">Loading comments...</p>;
+    return (
+      <div className="comments-loading">
+        <div className="skeleton skeleton-text" style={{ width: '80%' }} />
+        <div className="skeleton skeleton-text skeleton-text-sm" />
+      </div>
+    );
   }
 
   if (error) {

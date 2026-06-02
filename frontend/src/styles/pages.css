@@ -1,0 +1,446 @@
+/* ============================================================
+   PAGES.CSS — Page-Specific Styles
+   ============================================================ */
+
+/* ============================================================
+   LOGIN PAGE
+   ============================================================ */
+.login-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.login-page .insta-logo {
+  position: fixed;
+  top: 24px;
+  left: 32px;
+  width: 110px;
+  height: auto;
+  cursor: pointer;
+  z-index: 10;
+  transition: var(--transition-base);
+}
+
+.login-page .insta-logo:hover {
+  opacity: 0.8;
+}
+
+.login-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 80px;
+  padding: var(--space-4xl);
+  animation: fadeIn 0.5s ease;
+}
+
+/* ---- Left Hero ---- */
+.login-hero {
+  max-width: 560px;
+  text-align: center;
+}
+
+.hero-text {
+  font-family: var(--font-family);
+  font-size: var(--font-size-4xl);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--color-text);
+  margin-bottom: var(--space-3xl);
+  letter-spacing: -0.03em;
+}
+
+.hero-text span {
+  background: linear-gradient(135deg, var(--color-accent), #818CF8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-image {
+  width: 100%;
+  max-width: 520px;
+  border-radius: var(--radius-xl);
+  object-fit: cover;
+  box-shadow: var(--shadow-xl);
+  transition: var(--transition-slow);
+}
+
+.hero-image:hover {
+  transform: scale(1.02);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.1);
+}
+
+/* ---- Right Login Card ---- */
+.login-card-wrap {
+  width: 400px;
+}
+
+.login-box {
+  background: var(--color-card);
+  padding: var(--space-4xl);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.login-box h2 {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-2xl);
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+.login-box form,
+.register-card form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.login-box input,
+.register-card input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  color: var(--color-text);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: var(--transition-base);
+}
+
+.login-box input::placeholder,
+.register-card input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.login-box input:focus,
+.register-card input:focus {
+  border-color: var(--color-accent);
+  background: var(--color-bg);
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15);
+}
+
+.login-box button[type="submit"],
+.register-card button[type="submit"] {
+  width: 100%;
+  height: 48px;
+  border: none;
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-family);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.login-box button[type="submit"]:hover:not(:disabled),
+.register-card button[type="submit"]:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.login-box button[type="submit"]:disabled,
+.register-card button[type="submit"]:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.login-error,
+.register-error {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-error-light);
+  color: var(--color-error-dark);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  text-align: center;
+}
+
+.forgot {
+  text-align: center;
+  margin-top: var(--space-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.forgot:hover {
+  color: var(--color-accent-hover);
+}
+
+.signup {
+  margin-top: var(--space-xl);
+  text-align: center;
+}
+
+.signup p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.register-link {
+  color: var(--color-accent);
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  transition: var(--transition-base);
+}
+
+.register-link:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+}
+
+/* ============================================================
+   REGISTER PAGE
+   ============================================================ */
+.register-page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: var(--space-4xl);
+  background: var(--color-bg-secondary);
+}
+
+.register-card {
+  background: var(--color-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border-light);
+  padding: var(--space-4xl);
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+}
+
+.register-card h1 {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+  color: var(--color-text);
+}
+
+.register-card p {
+  color: var(--color-text-secondary);
+}
+
+/* ============================================================
+   PROFILE PAGE
+   ============================================================ */
+.profile-header {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: var(--space-3xl);
+  align-items: center;
+  background: var(--color-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-3xl);
+  margin-bottom: var(--space-2xl);
+}
+
+.profile-avatar-wrap {
+  display: grid;
+  place-items: center;
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 3px solid transparent;
+  background-image: linear-gradient(var(--color-card), var(--color-card)),
+                     linear-gradient(135deg, var(--color-accent), #818CF8, #C084FC);
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+}
+
+.profile-avatar-fallback {
+  display: grid;
+  place-items: center;
+  background: var(--color-accent-light);
+  color: var(--color-accent-dark);
+  font-size: 40px;
+  font-weight: 700;
+  border: 3px solid var(--color-accent);
+}
+
+.profile-main h1 {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+.profile-top-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.profile-stats {
+  display: flex;
+  gap: var(--space-2xl);
+  margin-top: var(--space-md);
+}
+
+.profile-stats p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+}
+
+.profile-stats strong {
+  color: var(--color-text);
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+}
+
+.profile-bio {
+  margin: var(--space-md) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+
+/* ---- Post Detail Page ---- */
+.post-detail-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: fadeInUp 0.4s ease;
+}
+
+.post-detail-body {
+  padding: var(--space-xl) var(--space-2xl) var(--space-2xl);
+}
+
+/* ---- Error States in Pages ---- */
+.feed-error {
+  background: var(--color-error-light);
+  color: var(--color-error-dark);
+  border: 1px solid #FECACA;
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  text-align: center;
+}
+
+/* ============================================================
+   RESPONSIVE - PAGES
+   ============================================================ */
+
+/* Login responsive */
+@media (max-width: 1024px) {
+  .login-main {
+    gap: 48px;
+    padding: var(--space-3xl);
+  }
+
+  .hero-text {
+    font-size: var(--font-size-3xl);
+  }
+
+  .hero-image {
+    max-width: 420px;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-main {
+    flex-direction: column;
+    gap: var(--space-3xl);
+    padding: var(--space-2xl);
+    padding-top: 80px;
+  }
+
+  .login-page .insta-logo {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin: var(--space-xl) auto 0;
+    display: block;
+  }
+
+  .login-hero {
+    max-width: 100%;
+  }
+
+  .hero-text {
+    font-size: var(--font-size-2xl);
+  }
+
+  .login-card-wrap {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-main {
+    padding: var(--space-lg);
+  }
+
+  .hero-image {
+    display: none;
+  }
+
+  .login-box {
+    padding: var(--space-2xl);
+  }
+}
+
+/* Profile responsive */
+@media (max-width: 768px) {
+  .profile-header {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: var(--space-2xl);
+  }
+
+  .profile-top-row {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .profile-stats {
+    justify-content: center;
+  }
+
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-header {
+    padding: var(--space-lg);
+    gap: var(--space-lg);
+  }
+
+  .profile-stats {
+    gap: var(--space-lg);
+  }
+}

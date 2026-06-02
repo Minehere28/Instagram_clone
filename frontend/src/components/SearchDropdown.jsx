@@ -13,9 +13,16 @@ function SearchDropdown({
 
   return (
     <div className="search-dropdown">
-      {loading ? <p className="search-status">Searching...</p> : null}
+      {loading ? (
+        <div className="search-status">
+          <div className="spinner spinner-sm" />
+          Searching...
+        </div>
+      ) : null}
 
-      {!loading && query && !results.length ? <p className="search-status">No users found</p> : null}
+      {!loading && query && !results.length ? (
+        <p className="search-status">No users found</p>
+      ) : null}
 
       {!loading && results.length ? (
         <ul className="search-list">

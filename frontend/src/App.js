@@ -1,11 +1,10 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-import "./styles/feed.css";
-import "./styles/grid.css";
-import "./styles/modal.css";
-import "./styles/navbar.css";
-import "./styles/profile.css";
-import "./styles/post.css";
+import "./styles/theme.css";
+import "./styles/layout.css";
+import "./styles/components.css";
+import "./styles/pages.css";
+
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import NotificationsPage from "./pages/NotificationsPage";

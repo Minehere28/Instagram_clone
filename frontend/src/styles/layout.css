@@ -1,0 +1,100 @@
+/* ============================================================
+   LAYOUT.CSS — Page Shells, Containers, Responsive Grid
+   ============================================================ */
+
+/* ---- App Shell ---- */
+.app-shell {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+/* ---- Feed Container (Home page) ---- */
+.feed-container {
+  max-width: 650px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-lg) var(--space-4xl);
+  animation: fadeIn 0.4s ease;
+}
+
+/* ---- Simple Page Container (Notifications, etc.) ---- */
+.page-container {
+  max-width: 650px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-lg) var(--space-4xl);
+  animation: fadeIn 0.4s ease;
+}
+
+/* ---- Profile Container ---- */
+.profile-container {
+  max-width: 935px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-lg) var(--space-4xl);
+  animation: fadeIn 0.4s ease;
+}
+
+/* ---- Post Detail Container ---- */
+.detail-container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-lg) var(--space-4xl);
+  animation: fadeIn 0.4s ease;
+}
+
+/* ---- Page Title ---- */
+.page-title {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-2xl);
+  letter-spacing: -0.02em;
+}
+
+/* ---- Sentinel for InfiniteLoader ---- */
+.infinite-loader-sentinel {
+  height: 8px;
+}
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS
+   ============================================================ */
+
+/* Tablet: <= 1024px */
+@media (max-width: 1024px) {
+  .profile-container {
+    max-width: 100%;
+    padding-left: var(--space-xl);
+    padding-right: var(--space-xl);
+  }
+}
+
+/* Small Tablet / Large Phone: <= 768px */
+@media (max-width: 768px) {
+  .feed-container,
+  .page-container,
+  .detail-container {
+    padding-left: var(--space-lg);
+    padding-right: var(--space-lg);
+    padding-top: var(--space-xl);
+  }
+
+  .page-title {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+/* Mobile: <= 480px */
+@media (max-width: 480px) {
+  .feed-container,
+  .page-container,
+  .detail-container,
+  .profile-container {
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+    padding-top: var(--space-lg);
+  }
+
+  .page-title {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-lg);
+  }
+}
