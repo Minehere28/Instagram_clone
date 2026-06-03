@@ -4,6 +4,19 @@ import Navbar from "../components/Navbar";
 import NotificationItem from "../components/NotificationItem";
 import { getNotifications } from "../services/notificationService";
 
+const SkeletonNotifications = () => {
+  return (
+    <div className="notification-card-container">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <div className="skeleton-notification-item" key={n}>
+          <div className="skeleton skeleton-circle skeleton-notification-avatar"></div>
+          <div className="skeleton skeleton-notification-text"></div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,10 +57,7 @@ function NotificationsPage() {
       <div className="simple-page">
         <h1>Notifications</h1>
         {loading ? (
-          <div className="loading-wrap">
-            <div className="spinner" />
-            <p>Loading notifications...</p>
-          </div>
+          <SkeletonNotifications />
         ) : null}
 
         {!loading && error ? <p className="feed-error">{error}</p> : null}

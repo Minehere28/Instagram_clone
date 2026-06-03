@@ -7,6 +7,32 @@ import PostGrid from "../components/PostGrid";
 import { getCurrentUser } from "../services/authService";
 import { getProfileByUsername, updateBio, uploadAvatar } from "../services/userService";
 
+const SkeletonProfile = () => {
+  return (
+    <>
+      <div className="skeleton-profile-header">
+        <div className="profile-avatar-wrap">
+          <div className="skeleton skeleton-circle skeleton-profile-avatar"></div>
+        </div>
+        <div className="skeleton-profile-main">
+          <div className="skeleton skeleton-profile-username"></div>
+          <div className="skeleton-profile-stats">
+            <div className="skeleton" style={{ height: "100%" }}></div>
+            <div className="skeleton" style={{ height: "100%" }}></div>
+            <div className="skeleton" style={{ height: "100%" }}></div>
+          </div>
+          <div className="skeleton skeleton-profile-bio"></div>
+        </div>
+      </div>
+      <div className="post-grid" style={{ marginTop: "24px" }}>
+        {[1, 2, 3, 4, 5, 6].map((n) => (
+          <div className="skeleton skeleton-grid-item" key={n}></div>
+        ))}
+      </div>
+    </>
+  );
+};
+
 function ProfilePage() {
   const { username } = useParams();
   const [profileData, setProfileData] = useState(null);
@@ -268,10 +294,7 @@ function ProfilePage() {
       <Navbar />
       <div className="profile-page">
         {loading ? (
-          <div className="loading-wrap">
-            <div className="spinner" />
-            <p>Loading profile...</p>
-          </div>
+          <SkeletonProfile />
         ) : null}
 
         {!loading && error ? <p className="feed-error">{error}</p> : null}
@@ -311,65 +334,67 @@ function ProfilePage() {
 
                     {previewSrc ? (
                       <div className="avatar-preview-wrap">
-                        <div
-                          ref={cropperRef}
-                          className="avatar-cropper"
-                          onPointerDown={handleAvatarPointerDown}
-                          onPointerMove={handleAvatarPointerMove}
-                          onPointerUp={handleAvatarPointerUp}
-                          onPointerCancel={handleAvatarPointerUp}
-                          onPointerLeave={handleAvatarPointerUp}
-                          style={{ cursor: dragging ? "grabbing" : "grab" }}
-                        >
-                          <img
-                            ref={imageRef}
-                            src={previewSrc}
-                            alt="preview"
-                            className="avatar-preview"
-                            onLoad={handleAvatarImageLoad}
-                            draggable={false}
-                            style={{
-                              transform: `translate(${cropState.x}px, ${cropState.y}px) scale(${cropState.scale})`,
-                            }}
-                          />
-                          <div className="avatar-crop-overlay" />
-                        </div>
-                        <label className="avatar-zoom-control">
-                          <span>Zoom</span>
-                          <input
-                            type="range"
-                            min="1"
-                            max="2.5"
-                            step="0.01"
-                            value={cropBaseScale ? cropZoom : 1}
-                            onChange={handleZoomChange}
-                            disabled={uploading}
-                          />
-                        </label>
-                        <p className="avatar-crop-hint">Drag the image to position it inside the square crop.</p>
-                        <div className="avatar-preview-actions">
-                          <button
-                            type="button"
-                            className="confirm-avatar-btn"
-                            onClick={handleConfirmAvatarUpload}
-                            disabled={uploading || !imageReady}
+                        <div className="avatar-cropper-card">
+                          <div
+                            ref={cropperRef}
+                            className="avatar-cropper"
+                            onPointerDown={handleAvatarPointerDown}
+                            onPointerMove={handleAvatarPointerMove}
+                            onPointerUp={handleAvatarPointerUp}
+                            onPointerCancel={handleAvatarPointerUp}
+                            onPointerLeave={handleAvatarPointerUp}
+                            style={{ cursor: dragging ? "grabbing" : "grab" }}
                           >
-                            Confirm Upload
-                          </button>
-                          <button
-                            type="button"
-                            className="cancel-avatar-btn"
-                            onClick={() => {
-                              setSelectedFile(null);
-                              setPreviewSrc(null);
-                              if (avatarInputRef.current) avatarInputRef.current.value = null;
-                            }}
-                            disabled={uploading}
-                          >
-                            Cancel
-                          </button>
+                            <img
+                              ref={imageRef}
+                              src={previewSrc}
+                              alt="preview"
+                              className="avatar-preview"
+                              onLoad={handleAvatarImageLoad}
+                              draggable={false}
+                              style={{
+                                transform: `translate(${cropState.x}px, ${cropState.y}px) scale(${cropState.scale})`,
+                              }}
+                            />
+                            <div className="avatar-crop-overlay" />
+                          </div>
+                          <label className="avatar-zoom-control">
+                            <span>Zoom</span>
+                            <input
+                              type="range"
+                              min="1"
+                              max="2.5"
+                              step="0.01"
+                              value={cropBaseScale ? cropZoom : 1}
+                              onChange={handleZoomChange}
+                              disabled={uploading}
+                            />
+                          </label>
+                          <p className="avatar-crop-hint">Drag the image to position it inside the square crop.</p>
+                          <div className="avatar-preview-actions">
+                            <button
+                              type="button"
+                              className="confirm-avatar-btn"
+                              onClick={handleConfirmAvatarUpload}
+                              disabled={uploading || !imageReady}
+                            >
+                              Confirm Upload
+                            </button>
+                            <button
+                              type="button"
+                              className="cancel-avatar-btn"
+                              onClick={() => {
+                                setSelectedFile(null);
+                                setPreviewSrc(null);
+                                if (avatarInputRef.current) avatarInputRef.current.value = null;
+                              }}
+                              disabled={uploading}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                          {avatarError ? <p className="avatar-error">{avatarError}</p> : null}
                         </div>
-                        {avatarError ? <p className="avatar-error">{avatarError}</p> : null}
                       </div>
                     ) : null}
                   </div>

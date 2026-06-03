@@ -6,6 +6,31 @@ import Navbar from "../components/Navbar";
 import PostCard from "../components/PostCard";
 import api from "../services/api";
 
+const SkeletonFeed = () => {
+  return (
+    <>
+      {[1, 2, 3].map((n) => (
+        <div className="skeleton-post-card" key={n}>
+          <div className="skeleton-post-header">
+            <div className="skeleton skeleton-circle skeleton-post-avatar"></div>
+            <div className="skeleton-post-meta">
+              <div className="skeleton skeleton-post-username"></div>
+              <div className="skeleton skeleton-post-time"></div>
+            </div>
+          </div>
+          <div className="skeleton skeleton-post-image"></div>
+          <div className="skeleton-post-actions">
+            <div className="skeleton skeleton-post-action"></div>
+            <div className="skeleton skeleton-post-action"></div>
+          </div>
+          <div className="skeleton skeleton-post-caption"></div>
+          <div className="skeleton skeleton-post-caption" style={{ width: "60%" }}></div>
+        </div>
+      ))}
+    </>
+  );
+};
+
 function HomePage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -66,9 +91,8 @@ function HomePage() {
       <Navbar onPostCreated={(newPost) => setPosts((prev) => [newPost, ...prev])} />
       <main className="feed-container">
         {loadingInitial ? (
-          <div className="loading-wrap" role="status" aria-live="polite">
-            <div className="spinner" />
-            <p>Loading feed...</p>
+          <div role="status" aria-live="polite">
+            <SkeletonFeed />
           </div>
         ) : null}
 
